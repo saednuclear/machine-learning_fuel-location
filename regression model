@@ -1,0 +1,35 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+
+
+input_data = 'C:/Users/alrawass/neutron_flux.csv'
+input_df = pd.read_csv(input_data, skipinitialspace=True)
+
+ncols = features.shape[1]
+model =  Sequential()
+model.add( Dense(ncols, activation='relu', input_shape=(ncols,)) )
+model.add( Dropout(0.2) )
+model.add( Dense(128, activation='relu') )
+model.add( Dropout(0.2) )
+model.add( Dense(64, activation='relu') )
+model.add( Dropout(0.2) )
+model.add( Dense(1) ) # output = no activation
+model.compile(optimizer='rmsprop', loss='mse', metrics=['mae'])
+model.fit(train_ft, train_tg, epochs=50, batch_size=10, verbose=0)
+# evaluate
+test_mse_loss, test_mae_score = model.evaluate(test_ft, test_tg, 
+                                              verbose=0)
+print(f'Mean Abs Error = ${test_mae_score:.2f}')
+
+# predict
+predictions = model.predict(test_ft)
+predict_diff = np.array([abs(p-test_tg[i]) \
+                         for i, p in enumerate(predictions)])
+print(f'Mean Abs Error = ${predict_diff.mean():.2f}')
